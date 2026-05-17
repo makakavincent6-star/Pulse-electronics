@@ -65,6 +65,40 @@ function addToCart(index, event) {
 
   renderCart();
 
+  // FLY EFFECT
+  const img = event.target.parentElement.querySelector("img");
+  const flyImg = img.cloneNode();
+
+  const rect = img.getBoundingClientRect();
+
+  flyImg.style.position = "fixed";
+  flyImg.style.left = rect.left + "px";
+  flyImg.style.top = rect.top + "px";
+  flyImg.style.width = "50px";
+  flyImg.style.height = "50px";
+  flyImg.style.transition = "all 0.7s ease";
+  flyImg.style.zIndex = "9999";
+
+  document.body.appendChild(flyImg);
+
+  const cartBtn = document.getElementById("cartBtn");
+  const cartRect = cartBtn.getBoundingClientRect();
+
+  setTimeout(() => {
+    flyImg.style.left = cartRect.left + "px";
+    flyImg.style.top = cartRect.top + "px";
+    flyImg.style.width = "10px";
+    flyImg.style.height = "10px";
+    flyImg.style.opacity = "0";
+  }, 10);
+
+  setTimeout(() => {
+    flyImg.remove();
+  }, 700);
+}
+
+  renderCart();
+
   // 🔥 FLYING EFFECT
   const img = event.target.parentElement.querySelector("img");
   const flyImg = img.cloneNode();
