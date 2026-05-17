@@ -1,59 +1,174 @@
 const products = [
-  { name: "Fast Charger", price: 600, image: "charger.jpg" },
-  { name: "Wireless Earbuds", price: 1800, image: "earbuds.jpg" }
+  {
+    name: "Fast Charger",
+    price: 600,
+    image: "images/charger.jpg"
+  },
+  {
+    name: "Wireless Earbuds",
+    price: 1800,
+    image: "images/earbuds.jpg"
+  }
 ];
 
+let cart = [];
+
+// DISPLAY PRODUCTS
 const container = document.getElementById("products");
 
-// BEST SELLER
-const bestSeller = products[0];
-
-const featured = document.createElement("div");
-featured.className = "card";
-
-featured.innerHTML = `
-  <div style="border:2px solid red; padding:10px; border-radius:10px;">
-    <p style="color:red;">🔥 HOT DEAL</p>
-    <img src="${bestSeller.image}" style="width:100%;">
-    <h2>${bestSeller.name}</h2>
-    <p>
-      <span style="text-decoration: line-through; color:gray;">
-        KES ${bestSeller.price + 200}
-      </span>
-      <b> KES ${bestSeller.price}</b>
-    </p>
-    <p style="color:red;">⚠ Limited stock available</p>
-    <button onclick="order('${bestSeller.name}', ${bestSeller.price})">
-      Buy Now
-    </button>
-  </div>
-`;
-
-container.appendChild(featured);
-
-// OTHER PRODUCTS
-products.slice(1).forEach(p => {
+products.forEach((p, index) => {
   const div = document.createElement("div");
   div.className = "card";
 
-  div.innerHTML = `
-    <img src="${p.image}" style="width:100%;">
-    <h3>${p.name}</h3>
-    <p>KES ${p.price}</p>
-    <p style="color:red; font-size:12px;">Only few left!</p>
-    <button onclick="order('${p.name}', ${p.price})">
-      Buy Now
-    </button>
-  `;
+  const img = document.createElement("img");
+  img.src = p.image;
+
+  const name = document.createElement("h3");
+  name.innerText = p.name;
+
+  const price = document.createElement("p");
+  price.innerText = "KES " + p.price;
+
+  const urgency = document.createElement("p");
+  urgency.innerText = "⚡ Limited stock!";
+  urgency.style.color = "red";
+
+  const btn1 = document.createElement("button");
+  btn1.innerText = "Buy Now";
+  btn1.onclick = () => order(p.name, p.price);
+
+  const btn2 = document.createElement("button");
+  btn2.innerText = "Add to Cart";
+  btn2.onclick = (e) => addToCart(index, e);
+
+  div.appendChild(img);
+  div.appendChild(name);
+  div.appendChild(price);
+  div.appendChild(urgency);
+  div.appendChild(btn1);
+  div.appendChild(btn2);
 
   container.appendChild(div);
 });
 
-// WHATSAPP ORDER
-function order(product, price) {
-  let phone = "254140321405";
-  let message = `Hi, I want to buy ${product} at KES ${price}. Is it available?`;
+// ADD TO CART
+function addToCart(index, event) {
+  const product = products[index];
 
+  const item = cart.find(i => i.name === product.name);
+
+  if (item) {
+    item.qty++;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
+
+  renderCart();
+
+  // 🔥 FLYING EFFECT
+  const img = event.target.parentElement.querySelector("img");
+  const flyImg = img.cloneNode();
+
+  const rect = img.getBoundingClientRect();
+  flyImg.style.left = rect.left + "px";
+  flyImg.style.top = rect.top + "px";
+
+  flyImg.classList.add("fly-img");
+  document.body.appendChild(flyImg);
+
+  const cartBtn = document.getElementById("cartBtn");
+  const cartRect = cartBtn.getBoundingClientRect();
+
+  setTimeout(() => {
+    flyImg.style.left = cartRect.left + "px";
+    flyImg.style.top = cartRect.top + "px";
+    flyImg.style.width = "20px";
+    flyImg.style.height = "20px";
+  }, 10);
+
+  setTimeout(() => {
+    flyImg.remove();
+  }, 700);
+}
+
+// RENDER CART
+function renderCart() {
+  const cartDiv = document.getElementById("cart");
+  cartDiv.innerHTML = "";
+
+  let total = 0;
+
+  cart.forEach((item, index) => {
+    cartDiv.innerHTML += `
+      <p>
+        ${item.name} x${item.qty} - KES ${item.price * item.qty}
+        <button onclick="removeItem(${index})">❌</button>
+      </p>
+    `;
+
+    total += item.price * item.qty;
+  });
+
+  cartDiv.innerHTML += `<h3>Total: KES ${total}</h3>`;
+}
+
+// REMOVE ITEM
+function removeItem(index) {
+  cart.splice(index, 1);
+  renderCart();
+}
+
+// BUY NOW
+function order(name, price) {
+  alert(`Order: ${name} - KES ${price}`);
+}
+
+// CHECKOUT
+function checkout() {
+  if (cart.length === 0) {
+    alert("Your cart is empty");
+    return;
+  }
+
+  document.getElementById("checkoutForm").style.display = "block";
+}
+
+// SEND ORDER
+function sendOrder() {
+  let customerName = document.getElementById("name").value;
+  let location = document.getElementById("location").value;
+
+  if (!customerName || !location) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  let message = `Hello, my name is ${customerName}.\n`;
+  message += `Location: ${location}\n\n`;
+  message += "I want to order:\n\n";
+
+  let total = 0;
+
+  cart.forEach(item => {
+    message += `${item.name} x${item.qty} - KES ${item.price * item.qty}\n`;
+    total += item.price * item.qty;
+  });
+
+  message += `\nTotal: KES ${total}`;
+
+  let phone = "254140321405";
   let url = "https://wa.me/" + phone + "?text=" + encodeURIComponent(message);
+
   window.open(url, "_blank");
+
+  document.getElementById("checkoutForm").style.display = "none";
+}
+function toggleCart() {
+  const cart = document.getElementById("cart");
+
+  if (cart.style.right === "0px") {
+    cart.style.right = "-100%";
+  } else {
+    cart.style.right = "0";
+  }
 }
