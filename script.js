@@ -2,12 +2,12 @@ const products = [
   {
     name: "Fast Charger",
     price: 600,
-    image: "images/charger.jpg"
+    image: "charger.jpg"
   },
   {
     name: "Wireless Earbuds",
     price: 1800,
-    image: "images/earbuds.jpg"
+    image: "earbuds.jpg"
   }
 ];
 
