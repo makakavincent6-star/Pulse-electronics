@@ -97,8 +97,6 @@ function addToCart(index, event) {
   }, 700);
 }
 
-  renderCart();
-
   // 🔥 FLYING EFFECT
   const img = event.target.parentElement.querySelector("img");
   const flyImg = img.cloneNode();
